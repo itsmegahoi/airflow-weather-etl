@@ -2,13 +2,19 @@ import requests
 from datetime import datetime
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 import json
+from dotenv import load_dotenv
+import os
 
-API_KEY = "b3b0f7d73e44a421f5aee04c0b853243"
-CITY = "Delhi"
-URL = f"http://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={API_KEY}&units=metric"
+load_dotenv()
 
 
 def fetch_weather_raw():
+    api_key = os.getenv("API_KEY")
+    city = os.getenv("CITY")
+    base_url = os.getenv("BASE_URL")
+
+    URL = f"{base_url}?q={city}&appid={api_key}&units=metric"
+
     response = requests.get(URL)
 
     if response.status_code == 200:
@@ -20,7 +26,7 @@ def fetch_weather_raw():
         )
 
     fetch_raw_data = (
-        CITY,
+        city,
         data["sys"]["country"],
         data["id"],
         data["weather"][0]["main"],
